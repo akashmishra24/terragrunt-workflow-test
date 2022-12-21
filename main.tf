@@ -15,30 +15,6 @@ resource "tls_private_key" "rsa" {
   rsa_bits  = 4096
 }
 
-#----------------------------------------------------------
-# Resource Group, VNet, Subnet selection & Random Resources
-#----------------------------------------------------------
-data "azurerm_resource_group" "rg" {
-  name = var.resource_group_name
-}
-
-data "azurerm_virtual_network" "vnet" {
-  name                = var.virtual_network_name
-  resource_group_name = data.azurerm_resource_group.rg.name
-}
-
-data "azurerm_subnet" "snet" {
-  name                 = var.subnet_name
-  virtual_network_name = data.azurerm_virtual_network.vnet.name
-  resource_group_name  = data.azurerm_resource_group.rg.name
-}
-
-data "azurerm_storage_account" "storeacc" {
-  count               = var.storage_account_name != null ? 1 : 0
-  name                = var.storage_account_name
-  resource_group_name = data.azurerm_resource_group.rg.name
-}
-
 resource "random_password" "passwd" {
   count       = (var.os_flavor == "linux" && var.disable_password_authentication == false && var.admin_password == null ? 1 : (var.os_flavor == "windows" && var.admin_password == null ? 1 : 0))
   length      = var.random_password_length
